@@ -10,11 +10,14 @@ class ServerRouter{
 
     config(){
         const objServerC = new ServerController.default();
-        this.router.get("/login", objServerC.home);
+        this.router.get("/login", objServerC.mostrarTodos);
         //this.router.get("/login/:user", objServerC.inicioSesion);
         this.router.post("/login", objServerC.inicioSesion);
-        this.router.put("/editar", objServerC.agregarUsuario);
-        this.router.get("/editar", objServerC.mostrarUsuariosNombre);
+        ///////////////////////////////////////////////////////
+        this.router.post("/editar", objServerC.actualizarEmpleado);
+        this.router.put("/editar", objServerC.agregarEmpleado);
+        this.router.get("/editar", objServerC.mostrarEmpleado);
+        this.router.delete("/editar", objServerC.eliminarEmpleadoID);
     }
 }
 

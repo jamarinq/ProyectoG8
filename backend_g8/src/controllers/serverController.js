@@ -1,10 +1,14 @@
-var registers = [
+const empleado = require('../models/empleado');
+const administrador = require('../models/administrador');
+
+/*var registers = [
     { user: "jose", password: "grupo_8a" },
     { user: "camila", password: "grupo_8b" },
     { user: "marco", password: "grupo_8c" },
     { user: "miguel", password: "grupo_8d" },
-];
+];*/
 
+/*
 var empleados = [
     {
         nombre: "Jose",
@@ -50,17 +54,23 @@ var empleados = [
         area: 3.9,
         fecha_de_nacimiento: 327,
     },
-];
+];*/
 
 class ServerController {
     constructor() {
 
     }
 
-    home(req, res) {
-        //console.log(req.params);
-        res.status(200).json({ mensaje: "ok", "otro": "grupo_8" });
+    mostrarTodos(req, res){
+        empleado.find({}, (error, data)=>{
+            if(error){
+                res.status(500).send("Error");
+            }else{
+                res.status(200).json(data);
+            }
+        });
     }
+
     inicioSesion(req, res) {
         //let usuario = req.params.user;
         //let pass = req.params.password;
@@ -68,29 +78,71 @@ class ServerController {
         let loginCorrecto = false;
         //console.log(user_name);
         //console.log(user_pass);
-        registers.forEach(element => {
-            //console.log(element);
-            if ((element.user == user_name) && (element.password == user_pass)) {
-                loginCorrecto = true;
+
+        administrador.find({user:user_name},(error, data) => {
+            console.log(data[0]["password"]);
+            if (error) {
+                res.status(500).json(error);
+            } else {
+                if(data[0]["password"] == user_pass){
+                    res.status(200).json({mensaje: "Login Correcto"});
+                }
+                else{
+                    res.status(401).json({mensaje: "Usuario o contraseña incorrectos"});
+                }             
             }
         });
-        if (loginCorrecto == true) {
-            res.status(200).json({ mensaje: "Login Correcto" });
-        }
-        else {
-            res.status(401).json({ mensaje: "Usuario o contraseña incorrectos" });
-        }
+    }
 
+    //// Funciones empleados
+    agregarEmpleado(req, res) {
+        empleado.create(req.body,(error,data)=>{
+            if (error) {
+                res.status(400).json({ error })
+            } else {
+                res.status(201).json({ message: "Usuario agregado" });
+            }
+        });  
     }
-    agregarUsuario(req, res) {
-        let {nombre, numero_documento, numero_telefonico, email, area, fecha_de_nacimiento} = req.body;
-        console.table({nombre, numero_documento, numero_telefonico, email, area, fecha_de_nacimiento});
-        //añadir el usuario al array
-        empleados.push(req.body);
-        res.status(201).json({ message: "Usuario agregado" });
+
+    mostrarEmpleado(req, res) {
+        let id = req.query.id;
+        //console.log(req);
+        //console.log({"id" : id});
+        empleado.findById(id,(error, data) => {
+            if (error) {
+                res.status(500).json(error);
+            } else {
+                res.status(200).json(data);
+            }
+        });
     }
-    mostrarUsuariosNombre(req, res){
-        res.status(200).json(empleados);
+
+    actualizarEmpleado(req, res) {
+        let { id, nombre, numero_documento, numero_telefonico, email, area, fecha_de_nacimiento, direccion } = req.body;
+        let obj = {
+            nombre, numero_documento, numero_telefonico, email, area, fecha_de_nacimiento, direccion
+        }
+        empleado.findByIdAndUpdate(id, {
+            $set: obj
+        }, (error, data) => {
+            if (error) {
+                res.status(500).json({ error });
+            } else {
+                res.status(200).json(data);
+            }
+        });
+    }
+
+    eliminarEmpleadoID(req,res){
+        let { id } = req.body;
+        estudiante.findByIdAndRemove(id, (error, data)=>{
+            if(error){
+                res.status(500).send("Error");
+            }else{
+                res.status(200).send("Empleado Borrado");
+            }
+        });
     }
 }
 

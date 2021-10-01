@@ -1,10 +1,12 @@
 const express = require('express');
+const DbConnection = require("./database/dbConnection");
 
 //Importar serverRouter
 const serverRouter = require('./routers/serverRouter');
 
 class Server{
     constructor(){
+        const bdConnection = new DbConnection();
         this.app = express();
         this.app.set('port', process.env.PORT || 3000);
         this.app.use(express.json());
