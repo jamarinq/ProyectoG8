@@ -19,7 +19,8 @@ const routes = [
   {
     path: '/Editar',
     name: 'Editar',
-    component: ()=> import('../views/Editar.vue')
+    props: true,
+    component: ()=> import('../views/Editar.vue'),
   },
   {
     path: '/about',

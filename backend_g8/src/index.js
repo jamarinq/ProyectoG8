@@ -1,5 +1,6 @@
 const express = require('express');
 const DbConnection = require("./database/dbConnection");
+const cors = require('cors');
 
 //Importar serverRouter
 const serverRouter = require('./routers/serverRouter');
@@ -10,6 +11,7 @@ class Server{
         this.app = express();
         this.app.set('port', process.env.PORT || 3000);
         this.app.use(express.json());
+        this.app.use(cors());
         const router = express.Router();
         router.get('/',(req,res)=>{
             res.status(200).json({message: "Conexion Exitosa", Proyecto: "Grupo 8"});

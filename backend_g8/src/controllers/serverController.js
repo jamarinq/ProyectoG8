@@ -76,19 +76,27 @@ class ServerController {
         //let pass = req.params.password;
         let { user_name, user_pass } = req.body;
         let loginCorrecto = false;
-        //console.log(user_name);
-        //console.log(user_pass);
+        console.log(user_name);
+        console.log(req.body);
 
         administrador.find({user:user_name},(error, data) => {
-            console.log(data[0]["password"]);
+            console.log(data);
             if (error) {
+                console.log(data[0]["aqui"]);
                 res.status(500).json(error);
             } else {
-                if(data[0]["password"] == user_pass){
-                    res.status(200).json({mensaje: "Login Correcto"});
+                if(data[0] != null){
+                    if(data[0]["password"] == user_pass){
+                        res.status(200).json({mensaje: "Login Correcto"});
+                        console.log(data[0]["password"]);
+                        console.log("Correcto");
+                    }
+                    else{
+                        res.status(401).json({mensaje: "Contraseña incorrecta"});
+                    }
                 }
                 else{
-                    res.status(401).json({mensaje: "Usuario o contraseña incorrectos"});
+                    res.status(401).json({mensaje: "Usuario no exite"});
                 }             
             }
         });
@@ -123,6 +131,7 @@ class ServerController {
         let obj = {
             nombre, numero_documento, numero_telefonico, email, area, fecha_de_nacimiento, direccion
         }
+        console.log( req.body);
         empleado.findByIdAndUpdate(id, {
             $set: obj
         }, (error, data) => {
@@ -136,7 +145,7 @@ class ServerController {
 
     eliminarEmpleadoID(req,res){
         let { id } = req.body;
-        estudiante.findByIdAndRemove(id, (error, data)=>{
+        empleado.findByIdAndRemove(id, (error, data)=>{
             if(error){
                 res.status(500).send("Error");
             }else{

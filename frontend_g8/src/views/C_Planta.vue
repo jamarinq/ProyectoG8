@@ -1,7 +1,7 @@
- <template>
+<template>
   <v-container fluid>
     <v-data-iterator
-      :items="items"
+      :items="empleados"
       :items-per-page.sync="itemsPerPage"
       :page.sync="page"
       :search="search"
@@ -48,7 +48,7 @@
         <v-row>
           <v-col
             v-for="item in props.items"
-            :key="item.name"
+            :key="item.nombre"
             cols="12"
             sm="6"
             md="4"
@@ -56,13 +56,13 @@
           >
             <v-card>
               <v-card-title class="subheading font-weight-bold">
-                {{ item.name }}
+                {{ item.nombre }}
               </v-card-title>
 
               <v-divider></v-divider>
 
               <v-list dense>
-                <v-list-item v-for="(key, index) in filteredKeys" :key="index">
+                <v-list-item v-for="(key, index) in keys2" :key="index">
                   <v-list-item-content
                     :class="{ 'blue--text': sortBy === key }"
                   >
@@ -75,7 +75,16 @@
                     {{ item[key.toLowerCase()] }}
                   </v-list-item-content>
                 </v-list-item>
-                <v-btn color= #42A5F5 class="mr-4" @click="editar"> Editar </v-btn>
+                <v-btn color="#42A5F5" class="mr-4" v-on:click="editar(item._id)">
+                  Editar
+                </v-btn>
+                <v-btn
+                  color="error"
+                  class="mr-4"
+                  v-on:click="eliminar(item._id)"
+                >
+                  Eliminar
+                </v-btn>
               </v-list>
             </v-card>
           </v-col>
@@ -112,24 +121,16 @@
 
           <v-spacer></v-spacer>
 
-          <span class="mr-4 grey--text">
-            Page {{ page }} of {{ numberOfPages }}
-          </span>
-          <v-btn
-            fab
-            dark
-            color="blue darken-3"
-            class="mr-1"
-            @click="formerPage"
-          >
-            <v-icon>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn fab dark color="blue darken-3" class="ml-1" @click="nextPage">
-            <v-icon>mdi-chevron-right</v-icon>
-          </v-btn>
+
+
         </v-row>
-        <v-row> 
-            <v-btn color= "error" class="mr-4" @click="cerrar_sesion"> Cerrar Sesion </v-btn>
+        <v-row>
+          <v-btn color="error" class="mr-4" @click="cerrar_sesion">
+            Cerrar Sesion
+          </v-btn>
+          <v-btn color="primary" class="mr-4" @click="registarEmpleado">
+            Agregar Empleado
+          </v-btn>
         </v-row>
       </template>
     </v-data-iterator>
@@ -137,6 +138,7 @@
 </template>
  
 <script>
+import store from "../store/index.js";
 export default {
   data() {
     return {
@@ -146,73 +148,39 @@ export default {
       sortDesc: false,
       page: 1,
       itemsPerPage: 3,
-      sortBy: "name",
+      sortBy: "nombre",
       keys: [
-        "Name",
+        "area",
+        "direccion",
+        "email",
+        "fecha_de_nacimiento",
+        "nombre",
+        "numero_documento",
+        "numero_telefonico",
+      ],
+      keys2: [
+        "Area",
+        "Direccion",
+        "Email",
+        "Fecha_de_nacimiento",
         "Numero_Documento",
         "Numero_Telefonico",
-        "Email",
-        "Area",
-        "Fecha_de_Nacimiento",
-        "Direccion",
-      ],
-      items: [
-        {
-          name: "Jose",
-          Numero_Documento: 159,
-          Numero_Telefonico: 6.0,
-          Email: 24,
-          Area: 4.0,
-          Fecha_de_Nacimiento: 87,
-          Direccion: "14%",
-        },
-        {
-          name: "Camila",
-          Numero_Documento: 237,
-          Numero_Telefonico: 9.0,
-          Email: 37,
-          Area: 4.3,
-          Fecha_de_Nacimiento: 129,
-          Direccion: "8%",
-        },
-        {
-          name: "Marco",
-          Numero_Documento: 262,
-          Numero_Telefonico: 16.0,
-          Email: 23,
-          Area: 6.0,
-          Fecha_de_Nacimiento: 337,
-          Direccion: "6%",
-        },
-        {
-          name: "Miguel",
-          Numero_Documento: 305,
-          Numero_Telefonico: 3.7,
-          Email: 67,
-          Area: 4.3,
-          Fecha_de_Nacimiento: 413,
-          Direccion: "3%",
-        },
-        {
-          name: "Daniela",
-          Numero_Documento: 356,
-          Numero_Telefonico: 16.0,
-          Email: 49,
-          Area: 3.9,
-          Fecha_de_Nacimiento: 327,
-        },
       ],
     };
   },
   computed: {
     numberOfPages() {
-      return Math.ceil(this.items.length / this.itemsPerPage);
+      return Math.ceil(this.empleados.length / this.itemsPerPage);
     },
     filteredKeys() {
-      return this.keys.filter((key) => key !== "Name");
+      return this.keys.filter((key) => key !== "nombre");
     },
   },
   methods: {
+    registarEmpleado() {
+      //this.$router.push("/Editar");
+      this.$router.push({name: "Editar", params : {id1: ""}});
+    },
     nextPage() {
       if (this.page + 1 <= this.numberOfPages) this.page += 1;
     },
@@ -222,11 +190,36 @@ export default {
     updateItemsPerPage(number) {
       this.itemsPerPage = number;
     },
-    cerrar_sesion(){
-        this.$router.push('/')
+    cerrar_sesion() {
+      this.$router.push("/");
     },
-    editar(){
-        this.$router.push('/Editar')
+    editar(obj) {
+     
+      let id=JSON.stringify(obj);
+      console.log(id);
+      this.$router.push({name: "Editar", params : {id1: id}});
+      //this.$router.push({name: "Editar", params : {id1: "kolo"}});
+    },
+
+    eliminar(id) {
+      let obj = { id };
+      store
+        .dispatch("eliminarEmpleado", obj)
+        .then(() => {
+          store.dispatch("cargarEmpleados");
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    },
+  },
+
+  created: () => {
+    store.dispatch("cargarEmpleados");
+  },
+  computed: {
+    empleados: () => {
+      return store.state.empleados;
     },
   },
 };
